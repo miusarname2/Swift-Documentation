@@ -374,6 +374,105 @@ class Citizen: Persons {
 var citizen = Citizen(city: "New York", age: 25, gender: "Cat");
 citizen.religion = "Christian"
 
+/* Enum
+ *
+ */
+
+enum Rank: Int {
+    case ace = 1
+    case two, three, four, five, six, seven, eight, nine, ten
+    case jack, queen, king
+
+
+    func simpleDescription() -> String {
+        switch self {
+        case .ace:
+            return "ace"
+        case .jack:
+            return "jack"
+        case .queen:
+            return "queen"
+        case .king:
+            return "king"
+        default:
+            return String(self.rawValue)
+        }
+    }
+}
+
+enum Suit {
+    case spades, hearts, diamonds, clubs
+
+
+    func simpleDescription() -> String {
+        switch self {
+        case .spades:
+            return "spades"
+        case .hearts:
+            return "hearts"
+        case .diamonds:
+            return "diamonds"
+        case .clubs:
+            return "clubs"
+        }
+    }
+}
+
+/* Struct
+ *
+ */
+
+struct Card {
+    var rank: Rank
+    var suit: Suit
+    func simpleDescription() -> String {
+        return "The \(rank.simpleDescription()) of \(suit.simpleDescription())"
+    }
+}
+let threeOfSpades = Card(rank: .three, suit: .spades)
+let threeOfSpadesDescription = threeOfSpades.simpleDescription()
+
+
+/* Concurrencia (async await)
+ *
+ */
+
+func fetchUsername(from server: String) async -> String {
+    let userID = await fetchUserID(from: server)
+    if userID == 501 {
+        return "John Appleseed"
+    }
+    return "Guest"
+}
+
+func connectUser(to server: String) async {
+    async let userID = fetchUserID(from: server)
+    async let username = fetchUsername(from: server)
+    let greeting = await "Hello \(username), user ID \(userID)"
+    print(greeting)
+}
+/* Task
+ * Para llamar codigo asincrono en entornos sincronos
+ */
+
+Task {
+    await connectUser(to: "primary")
+}
+
+/* Actor
+ * Actors are similar to classes, except they ensure that different asynchronous functions can safely interact with an instance of the same actor at the same time.
+ */
+
+actor ServerConnection {
+    var server: String = "primary"
+    private var activeUsers: [Int] = []
+    func connect() async -> Int {
+        let userID = await fetchUserID(from: server)
+        // ... communicate with server ...
+        activeUsers.append(userID)
+        return userID
+    }
+}
 
 
 
